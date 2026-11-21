@@ -40,7 +40,11 @@ pnpm build
 pnpm check:cases    # verdicts for stubbed chain states
 pnpm check:qorex    # every fix against the QoreX test double (refused, so nothing is spent)
 pnpm check:live qor1…   # the checkup against real diana accounts
+pnpm smoke          # the app in a browser with the QoreX test double (SMOKE_URL for the live site)
 ```
+
+Live: https://strongchar-qday.vercel.app. The film is built in `video/` (Remotion): `node video/scripts/record.mjs` records the
+clips from a running dev server, `uv run python video/scripts/score.py` writes the score, `pnpm --dir video render` renders it.
 
 The chain's REST API sends no CORS headers: the dev server proxies `/lcd-testnet` (`vite.config.ts`), and in
 production `vercel.json` rewrites only the four read paths the page uses.
@@ -55,6 +59,7 @@ production `vercel.json` rewrites only the four read paths the page uses.
   [`@qorechain/qorex-wallet-mock`](https://www.npmjs.com/package/@qorechain/qorex-wallet-mock) (tests)
 - [React](https://react.dev), [Vite](https://vite.dev), [wagmi](https://wagmi.sh), [viem](https://viem.sh),
   [RainbowKit](https://rainbowkit.com), [TanStack Query](https://tanstack.com/query), [tsx](https://tsx.is)
-- Fonts: Schibsted Grotesk and IBM Plex Mono (Google Fonts)
+- Fonts: Schibsted Grotesk and IBM Plex Mono (Google Fonts; Fontsource in the film)
+- Film: [Remotion](https://www.remotion.dev), [Playwright](https://playwright.dev) (recordings), [NumPy](https://numpy.org) (score)
 
 AI use: see [AI_USAGE.md](AI_USAGE.md). Licence: MIT.

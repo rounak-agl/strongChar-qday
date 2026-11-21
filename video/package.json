@@ -1,0 +1,23 @@
+{
+  "name": "qday-film",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "studio": "remotion studio src/index.ts",
+    "render": "remotion render src/index.ts QDay out/qday-checkup.mp4 --codec h264 --crf 18",
+    "still": "remotion still src/index.ts QDay out/still.png",
+    "record": "node scripts/record.mjs"
+  },
+  "dependencies": {
+    "@fontsource/ibm-plex-mono": "5.3.0",
+    "@fontsource/schibsted-grotesk": "5.3.0",
+    "@remotion/cli": "4.0.545",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "remotion": "4.0.545"
+  },
+  "devDependencies": {
+    "@types/react": "19.2.2",
+    "typescript": "5.9.3"
+  }
+}
