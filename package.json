@@ -3,16 +3,21 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "description": "A Vite + React + wagmi dApp for the QoreChain EVM, with RainbowKit and the QoreX wallet.",
+  "description": "Q-Day checkup: what a quantum computer could do with a QoreChain account, and fixes from QoreX.",
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "check:qorex": "tsx scripts/qorex-check.ts",
+    "check:live": "tsx scripts/check-live.ts",
+    "check:cases": "tsx scripts/check-cases.ts"
   },
   "dependencies": {
     "@qorechain/evm": "^0.14.0",
     "@qorechain/qorex-rainbowkit": "^0.1.0",
+    "@qorechain/qorex-types": "0.1.0",
+    "@qorechain/sdk": "0.14.0",
     "@rainbow-me/rainbowkit": "^2.2.11",
     "@tanstack/react-query": "^5.59.0",
     "react": "^18.3.1",
@@ -21,9 +26,11 @@
     "wagmi": "^2.19.5"
   },
   "devDependencies": {
+    "@qorechain/qorex-wallet-mock": "0.1.0",
     "@types/react": "^18.3.0",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.0",
+    "tsx": "^4.23.15",
     "typescript": "^5.6.3",
     "vite": "^5.4.0"
   }
