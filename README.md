@@ -1,65 +1,58 @@
-# QoreChain viem + wagmi starter
+# Q-Day checkup
 
-A Vite + React dApp for the QoreChain EVM built on [wagmi](https://wagmi.sh)
-and [RainbowKit](https://rainbowkit.com), with the QoreX wallet
-(`@qorechain/qorex-rainbowkit`) and the chain definitions from
-`@qorechain/evm`.
+**What could a quantum computer do with your QoreChain account?** Paste a `qor1…` or `0x…` address, or check your
+QoreX account, and see what the account has already made public on the diana testnet, what that would let a
+quantum attacker do, and fix it from QoreX with a hybrid (secp256k1 + ML-DSA-87) signed transaction.
 
-It connects a wallet, shows the latest block, the account's QOR balance and its
-EVM authorisation window, and sends a zero-value transaction to itself so you
-can see how the chain answers.
+A Quantum Pass entry for Build Before Q-Day, built with `create-qorechain-dapp` (viem-wagmi template). A small
+companion to [strongChar](https://github.com/rounak-agl/strongChar).
+
+## What it checks
+
+| Check | Read from | Why it matters on Q-Day |
+|---|---|---|
+| Is the secp256k1 public key on chain? | `cosmos/auth` account `pub_key`, EVM nonce | Shor's algorithm turns a public key into its private key. An address alone (a hash) is safe. |
+| ML-DSA-87 key registered, possession proven? | `qorechain/pqc/v1/account` | diana requires hybrid signatures from registered accounts (`hybrid_signature_mode = required`). Until a key is registered, the classical key alone can register one, so a quantum attacker could claim the account first. |
+| EVM authorisation window | `qorechain/pqc/v1/evm_window` via `evmWindowStatus` | EVM transactions carry secp256k1 signatures only. An open window lets that key alone spend up to the window's limits. Wide or long windows are flagged. |
+| ML-KEM-1024 encryption key | `qorechain/pqc/v1/kem` | Without one, nothing can be sealed to the address with post-quantum encryption. |
+
+Measured on diana on 22 Nov before writing the copy: none of the last 500 successful `MsgSend` transactions was
+signed classically only, and 49 of the last 50 PQC key registrations were.
+
+## Fixes, signed by QoreX
+
+QoreX signs every native-lane transaction with both keys and reports whether the committed transaction kept the
+ML-DSA-87 layer; the page shows that result.
+
+- **Close the EVM window** (`MsgCloseEVMWindow`).
+- **Narrow it**: close and reopen in one transaction, for about an hour, one transaction, 2 QOR, one target.
+- **Put the checkup on chain**: a 1 uqor transfer to yourself with the verdict and a report hash in the memo.
+- **Register a post-quantum key**: only QoreX can send that message, so the page tells you to do it there.
 
 ## Run
 
 ```sh
 pnpm install
-pnpm dev        # http://localhost:5173
-pnpm build      # type-check and build for production
+pnpm dev            # http://localhost:5173
+pnpm build
+pnpm check:cases    # verdicts for stubbed chain states
+pnpm check:qorex    # every fix against the QoreX test double (refused, so nothing is spent)
+pnpm check:live qor1…   # the checkup against real diana accounts
 ```
 
-The EVM window panel reads the chain's REST API, which sends no CORS headers, so
-the dev and preview servers forward `/lcd-testnet` and `/lcd-mainnet` to it
-(`vite.config.ts`). For production, serve the app behind a proxy that does the
-same.
+The chain's REST API sends no CORS headers: the dev server proxies `/lcd-testnet` (`vite.config.ts`), and in
+production `vercel.json` rewrites only the four read paths the page uses.
 
-## Networks
+## Credits
 
-`src/wagmi.ts` lists both QoreChain EVM chains, testnet first:
+- QoreChain kits: [`create-qorechain-dapp`](https://www.npmjs.com/package/create-qorechain-dapp) (scaffold),
+  [`@qorechain/evm`](https://www.npmjs.com/package/@qorechain/evm) (chains, `evmWindowStatus`),
+  [`@qorechain/qorex-rainbowkit`](https://www.npmjs.com/package/@qorechain/qorex-rainbowkit) (QoreX in RainbowKit),
+  [`@qorechain/qorex-types`](https://www.npmjs.com/package/@qorechain/qorex-types) (QoreX native lane),
+  [`@qorechain/sdk`](https://www.npmjs.com/package/@qorechain/sdk) (message builders, address conversion),
+  [`@qorechain/qorex-wallet-mock`](https://www.npmjs.com/package/@qorechain/qorex-wallet-mock) (tests)
+- [React](https://react.dev), [Vite](https://vite.dev), [wagmi](https://wagmi.sh), [viem](https://viem.sh),
+  [RainbowKit](https://rainbowkit.com), [TanStack Query](https://tanstack.com/query), [tsx](https://tsx.is)
+- Fonts: Schibsted Grotesk and IBM Plex Mono (Google Fonts)
 
-| Chain | Id | RPC |
-| --- | --- | --- |
-| `qorechainTestnet` | 9800 | `https://evm-testnet.qore.host` |
-| `qorechain` | 9801 | `https://evm.qore.host` |
-
-## Wallets
-
-- **QoreX** (`qorexWallet`): found through EIP-6963. It answers
-  `eth_chainId`, `eth_accounts`, `eth_requestAccounts` and
-  `wallet_switchEthereumChain` today; its EVM signing methods are not
-  available yet, so use it to connect and read.
-- **Injected** (`injectedWallet`): any browser wallet that exposes an EIP-1193
-  provider, for signing.
-
-Neither uses WalletConnect. To add a WalletConnect-based wallet, set
-`VITE_WALLETCONNECT_PROJECT_ID` in `.env`.
-
-## Sending: the EVM authorisation window
-
-QoreChain admits an EVM transaction only when the sender has a registered
-**ML-DSA-87** key and a live **EVM authorisation window**. Both are set up on
-QoreChain's native lane with the post-quantum key, so a browser wallet's
-secp256k1 key can never authorise spending on its own.
-
-The app reads the window with `evmWindowStatus` from `@qorechain/evm`. When a
-send is refused, `classifyEvmWindowRejection(error)` tells you why:
-
-| Result | Meaning |
-| --- | --- |
-| `no-pqc-key` | the account has no ML-DSA-87 key registered |
-| `no-window` | no window is open |
-| `exhausted` | the window ran out of blocks, transactions or value |
-| `invalid` | the window parameters were refused |
-
-Open the window from a wallet or tool that holds the account's post-quantum
-key (for example the `pnpm window open` helper in the `foundry` and `hardhat`
-templates), then send. Opening a window advances the account's nonce.
+AI use: see [AI_USAGE.md](AI_USAGE.md). Licence: MIT.
