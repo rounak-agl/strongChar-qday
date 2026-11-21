@@ -1,0 +1,15 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "rewrites": [
+    { "source": "/lcd-testnet/cosmos/auth/v1beta1/accounts/:addr", "destination": "https://api-testnet.qore.host/cosmos/auth/v1beta1/accounts/:addr" },
+    { "source": "/lcd-testnet/cosmos/bank/v1beta1/balances/:addr/by_denom", "destination": "https://api-testnet.qore.host/cosmos/bank/v1beta1/balances/:addr/by_denom" },
+    { "source": "/lcd-testnet/qorechain/pqc/v1/:kind(account|kem|evm_window)/:addr", "destination": "https://api-testnet.qore.host/qorechain/pqc/v1/:kind/:addr" }
+  ],
+  "headers": [
+    { "source": "/(.*)", "headers": [
+      { "key": "X-Content-Type-Options", "value": "nosniff" },
+      { "key": "Referrer-Policy", "value": "no-referrer" },
+      { "key": "X-Frame-Options", "value": "DENY" }
+    ] }
+  ]
+}
