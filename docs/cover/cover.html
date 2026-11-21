@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Q-Day checkup cover</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Schibsted+Grotesk:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root { --paper:#e8ece9; --sheet:#f6f8f6; --ink:#15211c; --muted:#55625c; --rule:#c9d1cc; --safe:#2b7653; --watch:#9a6511; --exposed:#b3261e; }
+  * { box-sizing:border-box; margin:0; }
+  body { width:1600px; height:900px; background:var(--paper); color:var(--ink); font-family:"Schibsted Grotesk",system-ui,sans-serif; overflow:hidden; }
+  .wrap { display:grid; grid-template-columns: 640px 1fr; gap:72px; padding:96px 96px; height:100%; align-items:center; }
+  .mark { font-weight:700; font-size:26px; letter-spacing:-0.01em; }
+  h1 { font-size:76px; line-height:1.02; letter-spacing:-0.035em; margin-top:28px; }
+  p.sub { margin-top:28px; font-size:26px; line-height:1.4; color:var(--muted); max-width:30ch; }
+  .addr { margin-top:40px; font:600 20px "IBM Plex Mono",monospace; color:var(--muted); }
+  .sheet { background:var(--sheet); border:1px solid var(--rule); border-radius:10px; border-top:10px solid var(--exposed); }
+  .verdict { padding:34px 40px 30px; border-bottom:1px solid var(--rule); }
+  .word { font-size:112px; font-weight:800; letter-spacing:-0.045em; line-height:.85; color:var(--exposed); }
+  .line { font-size:24px; font-weight:600; margin-top:18px; }
+  .f { display:grid; grid-template-columns:120px 1fr; gap:20px; padding:22px 40px; border-bottom:1px solid var(--rule); align-items:baseline; }
+  .f:last-child { border-bottom:0; }
+  .tag { font:600 17px "IBM Plex Mono",monospace; border-left:4px solid currentColor; padding-left:10px; }
+  .f h2 { font-size:23px; font-weight:600; }
+  .exposed { color:var(--exposed); } .watch { color:var(--watch); } .safe { color:var(--safe); }
+  .fix { margin-top:8px; font-size:17px; color:var(--muted); }
+</style></head>
+<body><div class="wrap">
+  <div>
+    <div class="mark">Q-Day checkup</div>
+    <h1>What could a quantum computer do with your account?</h1>
+    <p class="sub">Reads what a QoreChain account has made public, shows what its classical key could still do, and fixes it from QoreX with a hybrid ML-DSA-87 signature.</p>
+    <p class="addr">qor1… or 0x… · diana testnet</p>
+  </div>
+  <div class="sheet">
+    <div class="verdict"><div class="word">Exposed</div><div class="line">On Q-Day, someone who derives this key could act as the account.</div></div>
+    <div class="f"><span class="tag exposed">exposed</span><div><h2>Your secp256k1 public key is on chain</h2></div></div>
+    <div class="f"><span class="tag exposed">exposed</span><div><h2>No ML-DSA-87 key registered</h2><p class="fix">Its classical key alone could register one first</p></div></div>
+    <div class="f"><span class="tag safe">fine</span><div><h2>No EVM window open</h2></div></div>
+    <div class="f"><span class="tag watch">watch</span><div><h2>No ML-KEM-1024 encryption key</h2></div></div>
+  </div>
+</div></body></html>

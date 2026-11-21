@@ -1,5 +1,7 @@
 # Q-Day checkup
 
+![Q-Day checkup](docs/cover/cover.png)
+
 **What could a quantum computer do with your QoreChain account?** Paste a `qor1…` or `0x…` address, or check your
 QoreX account, and see what the account has already made public on the diana testnet, what that would let a
 quantum attacker do, and fix it from QoreX with a hybrid (secp256k1 + ML-DSA-87) signed transaction.
