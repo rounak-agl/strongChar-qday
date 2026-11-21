@@ -11,7 +11,8 @@
     "typecheck": "tsc --noEmit",
     "check:qorex": "tsx scripts/qorex-check.ts",
     "check:live": "tsx scripts/check-live.ts",
-    "check:cases": "tsx scripts/check-cases.ts"
+    "check:cases": "tsx scripts/check-cases.ts",
+    "smoke": "tsx scripts/smoke.ts"
   },
   "dependencies": {
     "@qorechain/evm": "^0.14.0",
@@ -30,6 +31,7 @@
     "@types/react": "^18.3.0",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.0",
+    "playwright": "1.65.1",
     "tsx": "^4.23.15",
     "typescript": "^5.6.3",
     "vite": "^5.4.0"
