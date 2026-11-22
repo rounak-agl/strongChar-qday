@@ -37,6 +37,12 @@ button:focus-visible, input:focus-visible, a:focus-visible { outline: 2px solid 
 .ask .row { display: flex; gap: 0.5rem; }
 .ask input { flex: 1; min-width: 0; font: 0.95rem var(--mono); padding: 0.6rem 0.75rem; border: 1px solid var(--rule); background: var(--sheet); color: var(--ink); border-radius: 4px; }
 .quick { display: flex; gap: 1.25rem; flex-wrap: wrap; margin-top: 0.75rem; font-size: 0.92rem; }
+.pulse { display: grid; grid-template-columns: auto 1fr; gap: 1.25rem; align-items: start; margin-top: 2.25rem; padding: 1.1rem 1.25rem; border-left: 4px solid var(--watch); background: var(--sheet); border-radius: 0 6px 6px 0; }
+.pulse p { margin: 0; color: var(--muted); max-width: 62ch; }
+.pulse .count { color: var(--ink); font: 500 1rem var(--mono); white-space: nowrap; }
+.pulse .count strong { display: block; font: 800 2.6rem/1 var(--sans); letter-spacing: -0.04em; color: var(--watch); }
+.pulse .meta { margin-top: 0.4rem; font-size: 0.82rem; }
+@media (max-width: 520px) { .pulse { grid-template-columns: 1fr; gap: 0.5rem; } }
 .err { color: var(--exposed); margin: 0.75rem 0 0; }
 
 .report { margin-top: 2.5rem; background: var(--sheet); border: 1px solid var(--rule); border-radius: 6px; }

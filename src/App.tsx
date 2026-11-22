@@ -1,9 +1,10 @@
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useEffect, useState, type FormEvent } from "react";
 import { keccak256, toBytes } from "viem";
 import { useAccount } from "wagmi";
 import { checkup, normalise, type Finding, type Level, type Report } from "./lib/check.js";
+import type { Registrations } from "./lib/registrations.js";
 import { closeWindow, narrowWindow, qorexCanSend, qorexInstalled, qorexNativeAddress, signCheckup } from "./lib/qorex.js";
 
 const SOURCES = { rest: "/lcd-testnet", evmRpc: "https://evm-testnet.qore.host" };
@@ -69,6 +70,8 @@ export function App() {
           {connectErr && <p className="err" role="alert">{connectErr}</p>}
         </form>
       </section>
+
+      <Pulse />
 
       {run.error && <p className="err" role="alert">Couldn't read the chain: {(run.error as Error).message}</p>}
       {run.data && <ReportView r={run.data} canFix={native === run.data.qor} onRecheck={() => check(run.data!.qor)} />}
@@ -151,5 +154,34 @@ function SignCheckup({ r, canFix }: { r: Report; canFix: boolean }) {
       <button disabled={s.isPending || !!s.data} onClick={() => s.mutate(() => signCheckup(r.qor, memo))}>{s.isPending ? "Approve in QoreX…" : s.data ? "Recorded" : "Sign and record"}</button>
       <Sent s={s} />
     </div>
+  );
+}
+
+/** Live from the chain: how many recent first-key registrations needed nothing but the secp256k1 signature. */
+function Pulse() {
+  const q = useQuery({
+    queryKey: ["registrations"],
+    queryFn: async () => {
+      const r = await fetch("/api/registrations");
+      if (!r.ok) throw new Error(String(r.status));
+      return (await r.json()) as Registrations & { checkedAt: string };
+    },
+    staleTime: 300_000, retry: 1,
+  });
+  if (!q.data || q.data.sampled === 0) return null;
+  const d = q.data;
+  const since = new Date(d.oldest).toLocaleDateString(undefined, { day: "numeric", month: "short" });
+  return (
+    <aside className="pulse" aria-label="Live on diana">
+      <p className="count"><strong>{d.classical}</strong> of {d.sampled}</p>
+      <div>
+        <p>
+          of the latest post-quantum key registrations on diana (since {since}) were accepted with a secp256k1
+          signature alone. An account's first ML-DSA-87 key needs nothing more, so on Q-Day an account without one belongs
+          to whoever registers first.
+        </p>
+        <p className="meta">Counted live from the chain at block {d.newestHeight.toLocaleString()}, refreshed every 5 minutes.</p>
+      </div>
+    </aside>
   );
 }

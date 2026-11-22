@@ -1,5 +1,5 @@
 import react from "@vitejs/plugin-react";
-import { defineConfig } from "vite";
+import { defineConfig, type Connect, type Plugin } from "vite";
 
 // The public REST APIs send no CORS headers, so the browser reaches them
 // through the dev (and preview) server: /lcd-testnet and /lcd-mainnet are
@@ -15,8 +15,22 @@ const proxy = {
   "/lcd-mainnet": rest("https://api.qore.host"),
 };
 
+// /api/registrations is a Vercel function in production; the dev server answers it with the same code.
+const registrations = (load: () => Promise<{ GET: () => Promise<Response> }>): Connect.NextHandleFunction => async (_req, res) => {
+  const r = await (await load()).GET();
+  res.statusCode = r.status;
+  res.setHeader("content-type", "application/json");
+  res.end(await r.text());
+};
+const api: Plugin = {
+  name: "registrations-api",
+  configureServer(server) {
+    server.middlewares.use("/api/registrations", registrations(() => server.ssrLoadModule("/api/registrations.ts") as any));
+  },
+};
+
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), api],
   server: { port: 5173, proxy },
   preview: { proxy },
 });

@@ -1,5 +1,6 @@
 // Verdicts for chain states the live accounts don't cover, from stubbed REST and RPC answers. Run: pnpm check:cases
 import { checkup } from "../src/lib/check";
+import { REGISTRATION, summarise, type TxResponse } from "../src/lib/registrations";
 
 const A = "qor1qf506wld3t970g56nhdenu9j2pmwuuxd472h6k";
 type State = { pubkey?: boolean; pqc?: "none" | "unproven" | "proven"; kem?: boolean; window?: Partial<Record<string, unknown>>; nonce?: number };
@@ -34,6 +35,14 @@ await expect("open window to any target", { pubkey: true, pqc: "proven", kem: tr
 await expect("long window, even if scoped", { pubkey: true, pqc: "proven", kem: true, window: { allowed_targets: ["0xabc"], remaining_blocks: "10000" } }, "exposed", { window: "exposed/narrow-window" });
 await expect("short scoped window", { pubkey: true, pqc: "proven", kem: true, window: { allowed_targets: ["0xabc"] } }, "watch", { window: "watch/close-window" });
 await expect("EVM nonce reveals the key, no PQC key", { nonce: 3 }, "exposed", { classical: "exposed" });
+
+// The live registrations panel: only successful registrations count, and "hybrid" means the ML-DSA-87 layer was there.
+const tx = (code: number, hybrid: boolean, type = REGISTRATION, where: "extension_options" | "non_critical_extension_options" = "extension_options"): TxResponse =>
+  ({ code, height: "10", timestamp: "2026-11-22T00:00:00Z", tx: { body: { messages: [{ "@type": type }], [where]: hybrid ? [{ "@type": "/qorechain.pqc.v1.PQCHybridSignature" }] : [] } } });
+const sum = summarise([tx(0, false), tx(0, true), tx(0, true, REGISTRATION, "non_critical_extension_options"), tx(5, false), tx(0, false, "/cosmos.bank.v1beta1.MsgSend")]);
+const sumOk = sum.sampled === 3 && sum.classical === 1 && sum.hybrid === 2;
+console.log(`  ${sumOk ? "✓" : "✗"} registrations: failed txs and other messages are ignored  ${JSON.stringify({ sampled: sum.sampled, classical: sum.classical, hybrid: sum.hybrid })}`);
+if (!sumOk) failed++;
 
 if (failed) { console.error(`${failed} cases failed`); process.exit(1); }
 console.log("every case gets the expected verdict");
