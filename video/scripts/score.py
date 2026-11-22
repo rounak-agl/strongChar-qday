@@ -4,11 +4,12 @@ from pathlib import Path
 
 import numpy as np
 
-SR, DUR = 44_100, 70.0
+SR, DUR = 44_100, 78.0
 t = np.arange(int(SR * DUR)) / SR
-CHORDS = [  # (start s, frequencies Hz): A minor, F, C, G, then back to A minor
+CHORDS = [  # (start s, frequencies Hz): A minor, F, C, G, A minor, C for the receipt, A minor to close
     (0, [110.0, 220.0, 261.63, 329.63]), (14, [87.31, 174.61, 220.0, 261.63]), (28, [130.81, 196.0, 261.63, 329.63]),
-    (42, [98.0, 196.0, 246.94, 293.66]), (56, [110.0, 220.0, 261.63, 329.63]),
+    (42, [98.0, 196.0, 246.94, 293.66]), (56, [110.0, 220.0, 261.63, 329.63]), (64, [130.81, 196.0, 261.63, 329.63]),
+    (72, [110.0, 220.0, 261.63, 329.63]),
 ]
 out = np.zeros_like(t)
 for i, (start, freqs) in enumerate(CHORDS):

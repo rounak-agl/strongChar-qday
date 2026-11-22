@@ -25,11 +25,12 @@ const SCENES: Scene[] = [
     [6.5, "Its key is still private. But with no ML-DSA-87 key, the classical key alone could register one first"],
   ]} /> },
   { len: s(9), node: <Facts /> },
-  { len: s(15), node: <Clip src="clips/qorex.webm" from={0.5} note="Recorded with the QoreX test double; nothing was sent" captions={[
-    [0, "Check your own QoreX account"],
-    [5, "Fixes appear where QoreX can sign: close or narrow an EVM window, or put the checkup on chain"],
-    [10.5, "QoreX signs each one with secp256k1 and ML-DSA-87 together"],
+  { len: s(15), node: <Clip src="clips/real.webm" from={0.5} captions={[
+    [0, "A real QoreX account on diana, checked after its fix"],
+    [5, "QoreX registered its ML-DSA-87 key with proof of possession, so the classical key can't act alone"],
+    [10.5, "Still to do: no ML-KEM-1024 key, so nothing can be sealed to it yet"],
   ]} /> },
+  { len: s(8), node: <Receipt /> },
   { len: s(6), node: <End /> },
 ];
 const FADE = s(0.6);
@@ -112,12 +113,32 @@ function Facts() {
   );
   return (
     <AbsoluteFill style={{ padding: "0 180px", justifyContent: "center", gap: 36 }}>
-      <p style={{ fontFamily: MONO, fontSize: 28, color: C.muted, margin: 0, ...rise(f, s(0.2)) }}>Measured on diana before writing the checkup</p>
+      <p style={{ fontFamily: MONO, fontSize: 28, color: C.muted, margin: 0, ...rise(f, s(0.2)) }}>Measured on diana, 22 Nov</p>
       {row(0.8, "0/500", "recent transfers were signed with a classical key alone", C.safe)}
-      {row(2.6, "49/50", "recent post-quantum key registrations were signed with a classical key alone", C.exposed)}
+      {row(2.6, "50/50", "latest post-quantum key registrations were accepted with a secp256k1 signature alone. The page counts it live", C.exposed)}
       <p style={{ fontSize: 46, fontWeight: 600, margin: "12px 0 0", maxWidth: 1450, lineHeight: 1.25, ...rise(f, s(4.8)) }}>
         So until an account registers its own ML-DSA-87 key, whoever registers one first controls it after Q-Day.
       </p>
+    </AbsoluteFill>
+  );
+}
+
+// The fix as it landed on chain, from the transaction itself (diana, 22 Nov 2026).
+function Receipt() {
+  const f = useCurrentFrame();
+  const line = (at: number, k: string, v: string, mono = true) => (
+    <div style={{ display: "grid", gridTemplateColumns: "300px 1fr", gap: 36, alignItems: "baseline", ...rise(f, s(at)) }}>
+      <span style={{ fontSize: 30, color: C.muted }}>{k}</span>
+      <span style={{ fontFamily: mono ? MONO : SANS, fontSize: mono ? 34 : 40, fontWeight: mono ? 500 : 600, overflowWrap: "anywhere" }}>{v}</span>
+    </div>
+  );
+  return (
+    <AbsoluteFill style={{ padding: "0 180px", justifyContent: "center", gap: 30 }}>
+      <p style={{ fontSize: 64, fontWeight: 800, letterSpacing: "-0.03em", margin: "0 0 10px", ...rise(f, s(0.2)) }}>The fix, on chain</p>
+      {line(0.9, "key registered", "block 10,537,517, proof of possession")}
+      {line(1.8, "checkup recorded", "tx 1619C021…4C23, block 10,537,520")}
+      {line(2.7, "memo", "q-day:watch classical:safe,pqc:watch,window:safe,kem:watch")}
+      {line(3.6, "signed with", "secp256k1 and ML-DSA-87 together", false)}
     </AbsoluteFill>
   );
 }
