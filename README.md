@@ -20,6 +20,10 @@ companion to [strongChar](https://github.com/rounak-agl/strongChar).
 | EVM authorisation window | `qorechain/pqc/v1/evm_window` via `evmWindowStatus` | EVM transactions carry secp256k1 signatures only. An open window lets that key alone spend up to the window's limits. Wide or long windows are flagged. |
 | ML-KEM-1024 encryption key | `qorechain/pqc/v1/kem` | Without one, nothing can be sealed to the address with post-quantum encryption. |
 
+The page also counts, live, how diana's latest 50 post-quantum key registrations were signed (`api/registrations.ts`, a
+Vercel function cached for 5 minutes). On 22 Nov all 50 were accepted with a secp256k1 signature alone: an account's
+first ML-DSA-87 key needs nothing more.
+
 Measured on diana on 22 Nov before writing the copy: none of the last 500 successful `MsgSend` transactions was
 signed classically only, and 49 of the last 50 PQC key registrations were.
 
